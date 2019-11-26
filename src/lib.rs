@@ -8,7 +8,7 @@ use sr_primitives::{
 	traits::SaturatedConversion,
 	transaction_validity::{
 		TransactionValidity, ValidTransaction, InvalidTransaction,
-		TransactionPriority,
+		TransactionPriority, TransactionLongevity,
 	},
 };
 
@@ -67,17 +67,23 @@ impl<T: Trait> Module<T> {
 	}
 }
 
+
 impl<T: Trait> support::unsigned::ValidateUnsigned for Module<T> {
 	type Call = Call<T>;
 
 	fn validate_unsigned(call: &Self::Call) -> TransactionValidity {
-			Ok(ValidTransaction {
-				priority: TransactionPriority::max_value(),
-				requires: vec![],
-				provides: vec![],
-				longevity: 64_u64,
-				propagate: true,
-			})
+		match call {
+			Call::submit_price(_) => {
+				Ok(ValidTransaction {
+					priority: TransactionPriority::max_value(),
+					requires: vec![],
+					provides: vec![],
+					longevity: TransactionLongevity::max_value(),
+					propagate: true,
+				})
+			}
+			_ => Err(InvalidTransaction::Call.into()),
+		}
 	}
 }
 
