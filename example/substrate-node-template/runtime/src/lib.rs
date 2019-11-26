@@ -34,6 +34,7 @@ pub use timestamp::Call as TimestampCall;
 pub use balances::Call as BalancesCall;
 pub use sr_primitives::{Permill, Perbill};
 pub use support::{StorageValue, construct_runtime, parameter_types, traits::Randomness};
+use system::offchain::TransactionSubmitter;
 
 /// An index to a block.
 pub type BlockNumber = u32;
@@ -241,6 +242,15 @@ impl template::Trait for Runtime {
 	type Event = Event;
 }
 
+type SubmitTransaction = TransactionSubmitter<(), Runtime, UncheckedExtrinsic>;
+
+/// Used for the module template in `./template.rs`
+impl price_oracle::Trait for Runtime {
+	type Call = Call;
+	type Event = Event;
+	type SubmitTransaction = SubmitTransaction;
+}
+
 construct_runtime!(
 	pub enum Runtime where
 		Block = Block,
@@ -258,6 +268,7 @@ construct_runtime!(
 		// Used for the module template in `./template.rs`
 		TemplateModule: template::{Module, Call, Storage, Event<T>},
 		RandomnessCollectiveFlip: randomness_collective_flip::{Module, Call, Storage},
+		PriceOracle: price_oracle::{Module, Call, Storage, Event},
 	}
 );
 

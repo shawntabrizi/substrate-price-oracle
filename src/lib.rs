@@ -1,13 +1,27 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
+use rstd::prelude::*;
 use support::{decl_module, decl_storage, decl_event};
 use system::{ensure_root, ensure_none};
-use sr_primitives::traits::SaturatedConversion;
+use system::offchain::SubmitUnsignedTransaction;
+use sr_primitives::{
+	traits::SaturatedConversion,
+	transaction_validity::{
+		TransactionValidity, ValidTransaction, InvalidTransaction,
+		TransactionPriority,
+	},
+};
 
 /// The module's configuration trait.
 pub trait Trait: system::Trait {
 	/// The overarching event type.
 	type Event: From<Event> + Into<<Self as system::Trait>::Event>;
+
+	/// A dispatchable call type.
+	type Call: From<Call<Self>>;
+
+	/// A transaction submitter.
+	type SubmitTransaction: SubmitUnsignedTransaction<Self, <Self as Trait>::Call>;
 }
 
 decl_event!(
@@ -39,18 +53,33 @@ decl_module! {
 			Price::put(price);
 		}
 
-		fn offchain_worker() {
-			Self::get_price();
+		fn offchain_worker(n: T::BlockNumber) {
+			Self::get_price(n);
 		}
 	}
 }
 
 impl<T: Trait> Module<T> {
-	pub fn get_price() -> u64 {
-		<system::Module<T>>::block_number().saturated_into::<u64>()
+	pub fn get_price(n: T::BlockNumber) {
+		let price = n.saturated_into::<u64>();
+		let call = Call::submit_price(price);
+		let _ = T::SubmitTransaction::submit_unsigned(call);
 	}
 }
 
+impl<T: Trait> support::unsigned::ValidateUnsigned for Module<T> {
+	type Call = Call<T>;
+
+	fn validate_unsigned(call: &Self::Call) -> TransactionValidity {
+			Ok(ValidTransaction {
+				priority: TransactionPriority::max_value(),
+				requires: vec![],
+				provides: vec![],
+				longevity: 64_u64,
+				propagate: true,
+			})
+	}
+}
 
 /// tests for this module
 #[cfg(test)]
@@ -58,13 +87,22 @@ mod tests {
 	use super::*;
 
 	use primitives::H256;
-	use support::{impl_outer_origin, assert_ok, parameter_types};
+	use support::{impl_outer_origin, impl_outer_dispatch, assert_ok, parameter_types};
 	use sr_primitives::{
-		traits::{BlakeTwo256, IdentityLookup}, testing::Header, weights::Weight, Perbill,
+		traits::{BlakeTwo256, IdentityLookup},
+		testing::{Header, TestXt},
+		weights::Weight,
+		Perbill,
 	};
 
 	impl_outer_origin! {
 		pub enum Origin for Test {}
+	}
+
+	impl_outer_dispatch! {
+		pub enum Call for Test where origin: Origin {
+			price_oracle::PriceOracle,
+		}
 	}
 
 	// For testing the module, we construct most of a mock runtime. This means
@@ -80,7 +118,7 @@ mod tests {
 	}
 	impl system::Trait for Test {
 		type Origin = Origin;
-		type Call = ();
+		type Call = Call;
 		type Index = u64;
 		type BlockNumber = u64;
 		type Hash = H256;
@@ -95,10 +133,16 @@ mod tests {
 		type AvailableBlockRatio = AvailableBlockRatio;
 		type Version = ();
 	}
+
+	type Extrinsic = TestXt<Call, ()>;
+	type SubmitTransaction = system::offchain::TransactionSubmitter<(), Call, Extrinsic>;
+
 	impl Trait for Test {
 		type Event = ();
+		type Call = Call;
+		type SubmitTransaction = SubmitTransaction;
 	}
-	type TemplateModule = Module<Test>;
+	type PriceOracle = Module<Test>;
 
 	// This function basically just builds a genesis storage key/value store according to
 	// our desired mockup.
@@ -109,11 +153,8 @@ mod tests {
 	#[test]
 	fn it_works_for_default_value() {
 		new_test_ext().execute_with(|| {
-			// Just a dummy test for the dummy funtion `do_something`
-			// calling the `do_something` function with a value 42
-			assert_ok!(TemplateModule::do_something(Origin::signed(1), 42));
-			// asserting that the stored value is equal to what we stored
-			assert_eq!(TemplateModule::something(), Some(42));
+			assert_ok!(PriceOracle::submit_price(Origin::system(system::RawOrigin::None), 100));
+			assert_eq!(PriceOracle::price(), 100);
 		});
 	}
 }

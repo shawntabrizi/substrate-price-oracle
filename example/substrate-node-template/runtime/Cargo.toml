@@ -33,7 +33,7 @@ std = [
     'safe-mix/std',
     'offchain-primitives/std',
     'substrate-session/std',
-    'price-oracle/std'
+    'price-oracle/std',
 ]
 
 [dependencies.price-oracle]

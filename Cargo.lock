@@ -991,7 +991,7 @@ dependencies = [
 [[package]]
 name = "simple-json"
 version = "0.1.0"
-source = "git+https://github.com/xlc/simple-json#2b5214965bcb9592299f31d59c8f63298b66edc4"
+source = "git+https://github.com/shawntabrizi/simple-json#a3ca51b81da36b3d127d6dff8a5855178bad213a"
 dependencies = [
  "paste 0.1.6 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
@@ -1227,7 +1227,7 @@ version = "0.1.0"
 dependencies = [
  "parity-scale-codec 1.0.6 (registry+https://github.com/rust-lang/crates.io-index)",
  "serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)",
- "simple-json 0.1.0 (git+https://github.com/xlc/simple-json)",
+ "simple-json 0.1.0 (git+https://github.com/shawntabrizi/simple-json)",
  "sr-io 2.0.0 (git+https://github.com/paritytech/substrate.git?rev=d1cd01c74e8d5550396cb654f9a3f1b641efdf4c)",
  "sr-primitives 2.0.0 (git+https://github.com/paritytech/substrate.git?rev=d1cd01c74e8d5550396cb654f9a3f1b641efdf4c)",
  "sr-std 2.0.0 (git+https://github.com/paritytech/substrate.git?rev=d1cd01c74e8d5550396cb654f9a3f1b641efdf4c)",
@@ -1624,7 +1624,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 "checksum serde 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)" = "9796c9b7ba2ffe7a9ce53c2287dfc48080f4b2b362fcc245a259b3a7201119dd"
 "checksum serde_derive 1.0.101 (registry+https://github.com/rust-lang/crates.io-index)" = "4b133a43a1ecd55d4086bd5b4dc6c1751c68b1bfbeba7a5040442022c7e7c02e"
 "checksum sha2 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)" = "7b4d8bfd0e469f417657573d8451fb33d16cfe0989359b93baf3a1ffc639543d"
-"checksum simple-json 0.1.0 (git+https://github.com/xlc/simple-json)" = "<none>"
+"checksum simple-json 0.1.0 (git+https://github.com/shawntabrizi/simple-json)" = "<none>"
 "checksum smallvec 0.6.10 (registry+https://github.com/rust-lang/crates.io-index)" = "ab606a9c5e214920bb66c458cd7be8ef094f813f20fe77a54cc7dbfff220d4b7"
 "checksum sr-api-macros 2.0.0 (git+https://github.com/paritytech/substrate.git?rev=d1cd01c74e8d5550396cb654f9a3f1b641efdf4c)" = "<none>"
 "checksum sr-arithmetic 2.0.0 (git+https://github.com/paritytech/substrate.git?rev=d1cd01c74e8d5550396cb654f9a3f1b641efdf4c)" = "<none>"
